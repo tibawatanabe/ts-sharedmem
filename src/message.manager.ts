@@ -26,7 +26,7 @@ export class MessageManager {
   }
 
   public disposeMessage(id: number) {
-    this.messages[id].subject.dispose();
+    this.messages[id].subject.unsubscribe();
     this.messages.delete(id);
   }
 }

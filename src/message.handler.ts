@@ -27,6 +27,7 @@ export class MessageHandler {
   }
 
   public onMessageFromWorker(message: Message) {
+
     if (!this.canHandle(message)) {
       return;
     }
@@ -34,6 +35,8 @@ export class MessageHandler {
     let replyParams = this.handle(message.type, message.params);
 
     let reply = new Message(message.id, 'reply', replyParams);
+
+    reply.pid = message.pid;
 
     this.msgManager.replyMessage(reply);
   }
