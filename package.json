@@ -4,6 +4,7 @@
   "description": "Typescript Shared Memory",
   "author": "Thiago Mizuno Watanabe",
   "scripts": {
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -13,5 +14,18 @@
   "bugs": {
     "url": "https://github.com/tibawatanabe/ts-sharedmem/issues"
   },
-  "homepage": "https://github.com/tibawatanabe/ts-sharedmem#readme"
+  "homepage": "https://github.com/tibawatanabe/ts-sharedmem#readme",
+  "engines": {
+    "node": ">= 6.5.0",
+    "npm": ">= 3"
+  },
+  "dependencies": {
+    "lru-cache": "^4.0.2",
+    "rxjs": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/lru-cache": "^4.0.0",
+    "@types/node": "^7.0.4",
+    "typescript": "^2.1.5"
+  }
 }
