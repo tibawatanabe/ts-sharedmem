@@ -1,9 +1,11 @@
-dist/
+test/
+
+.editorconfig
+tsconfig.json
+yarn.lock
 
 # Logs
 logs
-*.log
-npm-debug.log*
 
 # Runtime data
 pids
