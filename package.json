@@ -1,10 +1,11 @@
 {
   "name": "ts-sharedmem",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Typescript Shared Memory",
   "author": "Thiago Mizuno Watanabe",
   "scripts": {
-    "tsc": "tsc",
+    "prebuild": "rimraf dist",
+    "build": "tsc",
     "test": "ts-node test/index.ts"
   },
   "repository": {
@@ -21,14 +22,13 @@
     "npm": ">= 3"
   },
   "dependencies": {
-    "core-js": "^2.4.1",
     "lru-cache": "^4.0.2",
     "rxjs": "^5.0.3"
   },
   "devDependencies": {
-    "@types/core-js": "^0.9.35",
     "@types/lru-cache": "^4.0.0",
     "@types/node": "^7.0.4",
+    "rimraf": "^2.5.4",
     "ts-node": "^2.0.0",
     "typescript": "^2.1.5"
   }
