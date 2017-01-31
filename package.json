@@ -1,6 +1,6 @@
 {
   "name": "ts-sharedmem",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Typescript Shared Memory",
   "author": "Thiago Mizuno Watanabe",
   "scripts": {
@@ -8,6 +8,7 @@
     "build": "tsc",
     "test": "ts-node test/index.ts"
   },
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tibawatanabe/ts-sharedmem.git"
