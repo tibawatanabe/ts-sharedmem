@@ -19,18 +19,18 @@
   },
   "homepage": "https://github.com/tibawatanabe/ts-sharedmem#readme",
   "engines": {
-    "node": ">= 6.5.0",
-    "npm": ">= 3"
+    "node": ">= 8.2.1",
+    "npm": ">= 5"
   },
   "dependencies": {
-    "lru-cache": "^4.0.2",
-    "rxjs": "^5.0.3"
+    "lru-cache": "^4.1.1",
+    "rxjs": "^5.4.2"
   },
   "devDependencies": {
     "@types/lru-cache": "^4.0.0",
-    "@types/node": "^7.0.4",
-    "rimraf": "^2.5.4",
-    "ts-node": "^2.0.0",
-    "typescript": "^2.1.5"
+    "@types/node": "^8.0.17",
+    "rimraf": "^2.6.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
   }
 }
