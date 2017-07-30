@@ -4,7 +4,7 @@ import { SharedMem } from '../src/sharedmem';
 
 if (cluster.isMaster) {
 
-  SharedMem.initMaster({ max: 10, maxAge: 10000 });
+  SharedMem.init({ max: 10, maxAge: 10000 });
 
   for (let i = 0; i < 4; ++i) {
     cluster.fork();
@@ -12,7 +12,7 @@ if (cluster.isMaster) {
 
 } else {
 
-  let shared = SharedMem.initWorker();
+  let shared = SharedMem.init();
 
   for (let i = 0; i < 20; ++i) {
     let time = Math.floor((Math.random() * 10) + 1) * 100;
@@ -21,15 +21,10 @@ if (cluster.isMaster) {
       let random = Math.floor((Math.random() * 10) + 1);
 
       shared.get(`${random}`)
-            .subscribe(response => {
-              console.log(`#${random} got ${response}`);
-            });
+            .subscribe(response => console.log(`#${random} got ${response}`));
 
       shared.set(`${random}`, `${process.pid}`)
-            .subscribe(response => {
-              console.log(`#${random} were updated by ${process.pid}`);
-            });
-
+            .subscribe(response => console.log(`#${random} were updated by ${process.pid}`));
     }, time)
   }
 }

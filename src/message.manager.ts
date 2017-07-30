@@ -2,30 +2,33 @@ import { Observable } from 'rxjs/Observable';
 
 import { Message, MessageParams } from './message';
 import { MessageDispatcher } from './message.dispatcher';
+import { SendStrategy } from './message-dispatch.strategies';
 
 
 export class MessageManager {
-  private messages: Map<number, Message> = new Map<number, Message>();
-  private messagesCount: number = 0;
+  private messages      : Map<number, Message> = new Map<number, Message>();
+  private messagesCount : number = 0;
 
-  public getMessage(id: number): Message {
+  constructor(private dispatcher: SendStrategy) { }
+
+  get(id: number): Message {
     return this.messages[id];
   }
 
-  public replyMessage(message: Message) {
-    MessageDispatcher.sendToWorker(message);
+  reply(message: Message) {
+    this.dispatcher.send(message);
   }
 
-  public sendMessage(method: string, params?: MessageParams) : Observable<any> {
+  send(method: string, params?: MessageParams) : Observable<any> {
       let message = new Message(this.messagesCount++, method, params);
 
       this.messages[message.id] = message;
-      MessageDispatcher.sendToMaster(message);
+      this.dispatcher.send(message);
 
       return message.subject;
   }
 
-  public disposeMessage(id: number) {
+  dispose(id: number) {
     this.messages[id].subject.unsubscribe();
     this.messages.delete(id);
   }

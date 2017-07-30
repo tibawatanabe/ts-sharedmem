@@ -5,54 +5,59 @@ import * as LRU from 'lru-cache';
 import { MessageManager } from './message.manager';
 import { MessageHandler } from './message.handler';
 
+import { SendToMasterStrategy, SendToWorkerStrategy } from './message-dispatch.strategies';
+
 export class SharedMem {
 
-  public static initMaster(lruOptions: LRU.Options<string>) {
-    if (cluster.isWorker) {
-      throw Error('SharedMem.initMaster cannot be called from worker process.');
+  public static init(lruOptions?: LRU.Options<string>): SharedMem {
+    if (cluster.isMaster) {
+      if (!lruOptions) {
+        throw Error('SharedMem.init at master process needs LRU.Options.');
+      }
+      return SharedMem.initMaster(lruOptions);
+    } else {
+      return SharedMem.initWorker();
     }
+  }
 
-    let msgManager = new MessageManager();
+  private static initMaster(lruOptions: LRU.Options<string>) {
+    let msgManager = new MessageManager(new SendToWorkerStrategy);
     let lruCache   = LRU(lruOptions);
     let msgHandler = new MessageHandler(msgManager, lruCache);
 
     Object.keys(cluster.workers)
-          .forEach((workerId) => cluster.workers[workerId].on('message', (message) => msgHandler.onMessageFromWorker(message)));
+          .forEach((workerId) => cluster.workers[workerId].on('message', (message) => msgHandler.onMessage(message)));
 
     // forks created after this setup
-    cluster.on('fork', (worker) => worker.on('message', (message) => msgHandler.onMessageFromWorker(message)));
-  }
-
-  public static initWorker() : SharedMem {
-    if (cluster.isMaster) {
-      throw Error('SharedMem.initWorker cannot be called from master process.');
-    }
-
-    let msgManager = new MessageManager();
-    let msgHandler = new MessageHandler(msgManager);
-
-    process.on('message', (message) => msgHandler.onMessageFromMaster(message));
+    cluster.on('fork', (worker) => worker.on('message', (message) => msgHandler.onMessage(message)));
 
     return new SharedMem(msgManager);
   }
 
-  constructor(
-    private msgManager: MessageManager
-  ) { }
+  private static initWorker() : SharedMem {
+    let msgManager = new MessageManager(new SendToMasterStrategy);
+    let msgHandler = new MessageHandler(msgManager);
+
+    process.on('message', (message) => msgHandler.onMessage(message));
+
+    return new SharedMem(msgManager);
+  }
+
+  private constructor(private msgManager: MessageManager) { }
 
   public set(key: string, value: string, maxAge?: number) : Observable<any> {
-    return this.msgManager.sendMessage('set', { key, value, maxAge });
+    return this.msgManager.send('set', { key, value, maxAge });
   }
 
   public get(key: string) : Observable<any> {
-    return this.msgManager.sendMessage('get', { key });
+    return this.msgManager.send('get', { key });
   }
 
   public peek(key: string) : Observable<any> {
-    return this.msgManager.sendMessage('peek', { key });
+    return this.msgManager.send('peek', { key });
   }
 
   public del(key: string) : Observable<any> {
-    return this.msgManager.sendMessage('del', { key });
+    return this.msgManager.send('del', { key });
   }
 }

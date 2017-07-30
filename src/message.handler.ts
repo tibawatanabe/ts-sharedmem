@@ -10,12 +10,20 @@ export class MessageHandler {
     private cache?: Cache<string>
   ) { }
 
-  public onMessageFromMaster(reply: Message) {
+  public onMessage(message: Message) {
+    if (cluster.isMaster) {
+      this.onMessageFromWorker(message);
+    } else {
+      this.onMessageFromMaster(message);
+    }
+  }
+
+  private onMessageFromMaster(reply: Message) {
     if (!this.canHandle(reply)) {
       return;
     }
 
-    let message = this.msgManager.getMessage(reply.id);
+    let message = this.msgManager.get(reply.id);
 
     if (!message) {
       return;
@@ -23,10 +31,10 @@ export class MessageHandler {
 
     message.subject.next(reply.params.value);
 
-    process.nextTick(() => this.msgManager.disposeMessage(message.id));
+    process.nextTick(() => this.msgManager.dispose(message.id));
   }
 
-  public onMessageFromWorker(message: Message) {
+  private onMessageFromWorker(message: Message) {
 
     if (!this.canHandle(message)) {
       return;
@@ -38,7 +46,7 @@ export class MessageHandler {
 
     reply.pid = message.pid;
 
-    this.msgManager.replyMessage(reply);
+    this.msgManager.reply(reply);
   }
 
   private canHandle(message: Message) {

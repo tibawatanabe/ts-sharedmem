@@ -4,12 +4,20 @@ import { Message, MessageParams } from './message';
 
 export class MessageDispatcher {
 
-  public static sendToMaster(message: Message) {
+  public static send(message: Message) {
+    if (cluster.isMaster) {
+      MessageDispatcher.sendToWorker(message);
+    } else {
+      MessageDispatcher.sendToMaster(message);
+    }
+  }
+
+  private static sendToMaster(message: Message) {
     message.pid = process.pid;
     process.send(message);
   }
 
-  public static sendToWorker(message: Message) {
+  private static sendToWorker(message: Message) {
     let worker = findWorker(message.pid);
 
     if (worker) {
